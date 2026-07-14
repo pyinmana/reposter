@@ -36,10 +36,9 @@ Copy your API_ID and API_HASH.
 
 3. Setup the Script
 Open the Python script and replace the placeholder values with your actual credentials:
-# ==================== CONFIGURATION ====================
+# ======= CONFIGURATION ========
 API_ID = 1234567                # Replace with your API ID (Integer)
 API_HASH = 'your_api_hash_here'  # Replace with your API Hash (String)
-# =======================================================
 
 🛠️ How to Use
 Run the script from your terminal or command prompt:

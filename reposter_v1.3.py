@@ -12,22 +12,35 @@ logging.basicConfig(
 )
 logger = logging.getLogger("AutoPoster")
 
-# ==================== CONFIGURATION ====================
-API_ID = 34819220               # ပြောင်းလဲရန်မလို - ကိုယ့် API ID (Integer)
-API_HASH = '5085e66a3f993c21841dff14f0c88469' # ပြောင်းလဲရန်မလို - ကိုယ့် API Hash (String)
-# =======================================================
+print("================================================")
+print("     Telegram Fully Interactive Auto-Forwarder  ")
+print("================================================\n")
 
-print("--- Telegram Controlled Input Auto Forwarder ---")
+# ၁။ API ID နဲ့ Hash ကို အပြင်မှာပဲ Input အရင်ယူပြီး သေချာ သန့်စင်ပေးခြင်း
+while True:
+    try:
+        api_id_raw = input("Enter your Telegram API ID (Integer only): ").strip()
+        API_ID = int(api_id_raw)
+        break
+    except ValueError:
+        print("❌ Invalid API ID! It must be a number (e.g., 28471943). Please try again.")
 
-# ၁။ Source ဘယ်နှစ်ခုထည့်မလဲ အရင်မေးခြင်း
+while True:
+    API_HASH = input("Enter your Telegram API Hash: ").strip()
+    if API_HASH:
+        break
+    print("❌ API Hash cannot be empty.")
+
+# ၂။ Source Channels အရေအတွက် သတ်မှတ်ခြင်း
+print("\n--- Channel Configuration ---")
 while True:
     try:
         num_sources = int(input("How many Source Channels do you want to add? (Enter a number): "))
         if num_sources > 0:
             break
-        print("Please enter a number greater than 0.")
+        print("❌ Please enter a number greater than 0.")
     except ValueError:
-        print("Invalid input! Please enter a valid number (e.g., 3).")
+        print("❌ Invalid input! Please enter a valid number (e.g., 3).")
 
 # စာသားတွေကို ID သို့မဟုတ် Username ခွဲထုတ်ပေးမည့် Function
 def parse_chat_id(chat_input):
@@ -38,7 +51,7 @@ def parse_chat_id(chat_input):
         return int(chat_input)
     return chat_input
 
-# ၂။ သတ်မှတ်ထားတဲ့ အရေအတွက်အတိုင်း တစ်ခုချင်းစီ တောင်းခြင်း
+# ၃။ Source Channel များကို တောင်းခြင်း
 SOURCE_CHANNELS = []
 for i in range(1, num_sources + 1):
     while True:
@@ -46,20 +59,21 @@ for i in range(1, num_sources + 1):
         if src:
             SOURCE_CHANNELS.append(parse_chat_id(src))
             break
-        print("Input cannot be empty.")
+        print("❌ Input cannot be empty.")
 
-# ၃။ Target Channel ကို တောင်းခြင်း
+# ၄။ Target Channel ကို တောင်းခြင်း
 while True:
     TARGET_INPUT = input("\nEnter Target Channel (Only One): ").strip()
     if TARGET_INPUT:
         TARGET_CHANNEL = parse_chat_id(TARGET_INPUT)
         break
-    print("Input cannot be empty.")
+    print("❌ Input cannot be empty.")
 
+# ၅။ သန့်စင်ပြီးသား Variable တွေနဲ့မှ Client ကို စပြီး Create လုပ်ခြင်း (ဒါမှ Loop မငြိမှာပါ)
+print("\n--- Starting Telegram Client ---")
 logger.info("Initializing Telegram Client...")
 client = TelegramClient('ultimate_forwarder_session', API_ID, API_HASH)
 
-# chats=SOURCE_CHANNELS ထဲက ချန်နယ်အားလုံးကို စောင့်ဖတ်မှာပါ
 @client.on(events.NewMessage(chats=SOURCE_CHANNELS))
 async def handler(event):
     message = event.message
@@ -100,8 +114,9 @@ async def handler(event):
         logger.error(f"Unexpected General Error: {e}")
 
 async def main():
+    # client.start() က ဖုန်းနံပါတ်နဲ့ ကုတ်ကို သီးသန့် အဆင်ပြေပြေ တောင်းသွားပါလိမ့်မယ်
     await client.start()
-    logger.info(f"Connected! Monitoring {len(SOURCE_CHANNELS)} sources to Target...")
+    logger.info(f"Connected successfully! Monitoring {len(SOURCE_CHANNELS)} sources to Target...")
 
 if __name__ == '__main__':
     with client:
